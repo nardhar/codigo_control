@@ -7,10 +7,10 @@ El proyecto tiene como objetivo ser una librería de fácil implementación util
 Por el momento solo se tiene generado para:
  * PHP 4.0.4+ https://github.com/downloads/nardhar/codigo_control/codigocontrol_php_1.0.zip (verificando compatibilidad de versiones) Nota: Usa la extensión libbcmath para el manejo de números de 64 bits (18 dígitos)
 Se plantea tener el codigo generado y testeado para:
- * C (en desarrollo)
- * C# 1.0+ (en desarrollo)
+ * Groovy (terminado, empaquetando)
+ * C# 1.0+ (terminado, empaquetando)
  * Java (en desarrollo)
- * Groovy (en desarrollo)
+ * C (en desarrollo)
  * Pl/SQL (en desarrollo)
  * Ruby (próxima versión)
  * Python (próxima versión)

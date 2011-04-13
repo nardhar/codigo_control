@@ -3,5 +3,7 @@
 *.zip
 *.tgz
 *.gz
+*.jar
+*.class
 #*#
 *.marks
