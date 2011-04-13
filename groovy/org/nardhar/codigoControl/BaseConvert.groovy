@@ -3,7 +3,7 @@ package org.nardhar.codigoControl
 /**
  * Generacion del codigo de control v7 para impuestos internos de Bolivia
  * 
- * Copyright (c) 2010 Felix A. Carreño B. felix.carreno@gmail.com
+ * Copyright (c) 2011 Felix A. Carreño B. felix.carreno@gmail.com
  * 
  * Permission is hereby granted, free of charge, to any
  * person obtaining a copy of this software and associated
