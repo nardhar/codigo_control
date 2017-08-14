@@ -30,7 +30,8 @@ package org.nardhar.codigoControl
 class VerhoeffDigit {
     
 	// Verhoeff Digit table variables
-	def static verD = [ [0,1,2,3,4,5,6,7,8,9],
+	private verD = [
+	  [0,1,2,3,4,5,6,7,8,9],
 		[1,2,3,4,0,6,7,8,9,5],
 		[2,3,4,0,1,7,8,9,5,6],
 		[3,4,0,1,2,8,9,5,6,7],
@@ -40,8 +41,9 @@ class VerhoeffDigit {
 		[7,6,5,9,8,2,1,0,4,3],
 		[8,7,6,5,9,3,2,1,0,4],
 		[9,8,7,6,5,4,3,2,1,0]
-		]
-	def static verP = [ [0,1,2,3,4,5,6,7,8,9],
+  ]
+	private verP = [
+	  [0,1,2,3,4,5,6,7,8,9],
 		[1,5,7,6,2,8,3,0,9,4],
 		[5,8,0,3,7,9,6,1,4,2],
 		[8,9,1,6,0,4,3,5,2,7],
@@ -49,31 +51,31 @@ class VerhoeffDigit {
 		[4,2,8,6,5,7,3,9,0,1],
 		[2,7,9,3,8,0,6,4,1,5],
 		[7,0,4,6,9,1,3,2,5,8]
-		]
-	def static verInv = [0,4,3,2,1,5,6,7,8,9]
+  ]
+	private verInv = [0,4,3,2,1,5,6,7,8,9]
 	
-    def static calcsum(Long number) {
-    	return calcsum(number.toString())
+  Integer calcsum(Long number) {
+    calcsum(number.toString())
+  }
+  
+  Integer calcsum(String number) {
+    def c = 0
+    def n = number.reverse()
+    n.size().times { val ->
+      c = verD[ c ][ verP[ (val + 1) % 8 ][ n[val].toInteger() ] ]
     }
-    
-    def static calcsum(String number) {
-        def c = 0
-        def n = number.reverse()
-        def len = n.size()
-        (0..<len).each {
-        	c = verD[ c ][ verP[ (it + 1) % 8 ][ n[it].toInteger() ] ]
-        }
-        return verInv[c]
+    verInv[c]
+  }
+  
+  Long addRecursive(Long number, digits) {
+    addRecursive(number.toString(), digits).toLong()
+  }
+  
+  String addRecursive(String number, digits) {
+    digits.times {
+      number += calcsum(number)
     }
-    
-    def static addRecursive(Long number, digits) {
-    	return addRecursive(number.toString(), digits).toLong()
-    }
-    
-    def static addRecursive(String number, digits) {
-        (1..digits).each {
-            number += calcsum(number)
-        }
-        return number
-    }
+    number
+  }
+
 }
