@@ -7,3 +7,5 @@
 *.class
 #*#
 *.marks
+groovy/build/*
+groovy/.gradle/*

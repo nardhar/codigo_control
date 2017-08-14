@@ -1,0 +1,76 @@
+// buildscript options
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0"
+    }
+}
+
+// Apply the groovy plugin to add support for Groovy
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+apply plugin: "com.jfrog.artifactory"
+
+version '1.0'
+group 'org.nardhar.codigoControl'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // We use the latest groovy 2.x version for building this library
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+
+    // We use the awesome Spock testing and specification framework
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'junit:junit:4.12'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// for publishing to maven
+publishing {
+    publications {
+        main(MavenPublication) {
+            artifactId 'codigo-control'
+            
+            from components.java
+            artifact sourcesJar
+        }
+    }
+}
+
+// artifactory publishing configurations
+// must use command:
+// $ gradle build artifactoryPublish
+artifactory {
+    contextUrl = 'https://repo.nardhar.org/'
+    resolve {
+        repository {
+            repoKey = 'libs-release-local'
+        }
+    }
+    publish {
+        repository {
+            repoKey = 'libs-release-local'
+            username = "${artifactory_lib_release_username}"
+            password = "${artifactory_lib_release_password}"
+            // config vars saved in ~/.gradle/gradle.properties as
+            // artifactory_lib_release_username=myusername
+            // artifactory_lib_release_password=password
+        }
+        defaults {
+            publications 'main'
+        }
+    }
+}
