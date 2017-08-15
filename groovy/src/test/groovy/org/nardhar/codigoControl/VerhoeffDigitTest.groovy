@@ -12,7 +12,7 @@ class VerhoeffDigitTest extends Specification{
     def digit = vd.calcsum('123456')
     
     then:
-    digit == 0
+    digit == 8
   }
 
 }

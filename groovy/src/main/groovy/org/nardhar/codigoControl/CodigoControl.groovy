@@ -3,7 +3,7 @@ package org.nardhar.codigoControl
 /**
  * Generacion del codigo de control v7 para impuestos internos de Bolivia
  * 
- * Copyright (c) 2011 Felix A. Carreño B. felix.carreno@gmail.com
+ * Copyright (c) 2017 Felix A. Carreño B. felix.carreno@gmail.com
  * 
  * Permission is hereby granted, free of charge, to any
  * person obtaining a copy of this software and associated
@@ -86,11 +86,11 @@ class CodigoControl {
     
     def digitossum = []
     def cadenas = []
-    def inicio = 0
-    digitos[-5..-1].each { d ->
-      digitossum.add(d.toInteger() + 1)
-      cadenas.add(llave[inicio..(inicio + d.toInteger())])
-      inicio += d.toInteger() + 1
+    
+    digitos[-5..-1].inject(0) { inicio, val ->
+      digitossum.add(val.toInteger() + 1)
+      cadenas.add(llave[inicio..(inicio + val.toInteger())])
+      inicio + val.toInteger() + 1
     }
     
     autorizacion += cadenas[0]
@@ -120,14 +120,13 @@ class CodigoControl {
   }
 
   String allegedRC4(String mensaje, String llaverc4) {
-    def state = []
-    256.times { state[it] = it }
+    def state = (0..255).toList()
+    //256.times { state[it] = it }
     def x = 0
     def y = 0
     def index1 = 0
     def index2 = 0
     def nmen = 0
-    def cifrado = ''
     
     def strlen_llave = llaverc4.size()
     def strlen_mensaje = mensaje.size()
@@ -140,7 +139,7 @@ class CodigoControl {
       
       index1 = (index1 + 1) % strlen_llave
     }
-    strlen_mensaje.times {
+    (1..strlen_mensaje).inject('') { cifrado, val ->
       x = (x + 1) % 256
       y = (state[x] + y) % 256
       //(state[x], state[y]) = [state[y], state[x]]
@@ -148,10 +147,9 @@ class CodigoControl {
       state[y] = state[x]
       state[x] = temp
       // ^ = XOR function
-      nmen = ((int)mensaje[it]) ^ state[ ( state[x] + state[y] ) % 256]
-      cifrado += ('0' + toBase(nmen, 16))[-2..-1]
+      nmen = ((int)mensaje[val]) ^ state[ ( state[x] + state[y] ) % 256]
+      cifrado + ('0' + toBase(nmen, 16))[-2..-1]
     }
-    cifrado
   }
   
   String toBase(String numero, Integer base = 64) {
@@ -177,13 +175,7 @@ class CodigoControl {
         palabra = dic[resto.toInteger()] + palabra
         numero = cociente.toInteger()
       }
-      if (palabra.size() > 1) {
-        // quitando ceros de la izquierda
-        while (palabra[0] == '0') {
-          palabra = palabra.substring(1)
-        }
-      }
-      palabra
+      palabra.size() > 1 ? palabra.replaceAll(/^0+(.*)/, '$1') : palabra
   }
 
   String verhoeffDigit(String value, Integer digits = 1) {
