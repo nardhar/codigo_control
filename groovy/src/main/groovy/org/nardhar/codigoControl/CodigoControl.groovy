@@ -27,6 +27,10 @@ package org.nardhar.codigoControl
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+import java.text.NumberFormat
+import java.text.DecimalFormat
+
 class CodigoControl {
   
   String nit
@@ -72,8 +76,9 @@ class CodigoControl {
     def factura = this.numero.toString()
     def nitci = this.nit ?: '0'
     def fecha = this.fecha.format('yyyyMMdd')
-    def monto = this.importe.setPrecision(0).format('#0')
+    def monto = new DecimalFormat('#0').format(this.importe.setScale(0, BigDecimal.ROUND_HALF_UP))
     def llave = this.llave
+    
     // paso 1
     factura = verhoeffDigit(factura, 2)
     nitci = verhoeffDigit(nitci, 2)
@@ -81,15 +86,17 @@ class CodigoControl {
     monto = verhoeffDigit(monto, 2)
     def suma = factura.toBigDecimal() + nitci.toBigDecimal() + fecha.toBigDecimal() + monto.toBigDecimal()
     suma = verhoeffDigit(suma.toString(), 5).toBigDecimal()
+    
     // paso2
     def digitos = suma.toString()[-5..-1]
     
     def digitossum = []
     def cadenas = []
     
-    digitos[-5..-1].inject(0) { inicio, val ->
+    digitos[-5..-1].toList().inject(0) { inicio, val ->
       digitossum.add(val.toInteger() + 1)
-      cadenas.add(llave[inicio..(inicio + val.toInteger())])
+      //cadenas.add(llave[inicio..(inicio + val.toInteger())])
+      cadenas.add(llave.substring(inicio, inicio + val.toInteger() + 1))
       inicio + val.toInteger() + 1
     }
     
@@ -121,15 +128,10 @@ class CodigoControl {
 
   String allegedRC4(String mensaje, String llaverc4) {
     def state = (0..255).toList()
-    //256.times { state[it] = it }
-    def x = 0
-    def y = 0
     def index1 = 0
     def index2 = 0
-    def nmen = 0
-    
     def strlen_llave = llaverc4.size()
-    def strlen_mensaje = mensaje.size()
+    
     256.times {
       index2 = ( ((int) llaverc4[index1]) + state[it] + index2 ) % 256
       //(state[it], state[index2]) = [state[index2], state[it]]
@@ -139,6 +141,11 @@ class CodigoControl {
       
       index1 = (index1 + 1) % strlen_llave
     }
+    
+    def x = 0
+    def y = 0
+    def nmen = 0
+    def strlen_mensaje = mensaje.size()
     (1..strlen_mensaje).inject('') { cifrado, val ->
       x = (x + 1) % 256
       y = (state[x] + y) % 256
@@ -147,7 +154,7 @@ class CodigoControl {
       state[y] = state[x]
       state[x] = temp
       // ^ = XOR function
-      nmen = ((int)mensaje[val]) ^ state[ ( state[x] + state[y] ) % 256]
+      nmen = ((int)mensaje[val - 1]) ^ state[( state[x] + state[y] ) % 256]
       cifrado + ('0' + toBase(nmen, 16))[-2..-1]
     }
   }
